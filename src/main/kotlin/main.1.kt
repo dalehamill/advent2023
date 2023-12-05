@@ -1,33 +1,41 @@
 import java.io.File
 
 fun main(args: Array<String>) {
-    val list = arrayListOf<List<Int>>()
-    var curr = arrayListOf<Int>()
-    list.add(curr)
+    var sumCalibrations = 0
+    var sumCalibrations2 = 0
     File("src/main/resources/data.1.txt").forEachLine {
-        if (it.toString().isEmpty()) {
-            curr = arrayListOf()
-            list.add(curr)
-        } else {
-            curr.add(it.toInt())
+        sumCalibrations += findCalibrationValue(it)
+        sumCalibrations2 += findCalibrationValue2(it)
+    }
+
+    println(sumCalibrations)
+    println(sumCalibrations2)
+}
+
+fun findCalibrationValue(str: String): Int {
+    var ret = 0
+    ret += (str.firstOrNull { it.isDigit() }?.digitToInt() ?: 0) * 10
+    ret += str.lastOrNull {it.isDigit() }?.digitToInt() ?: 0
+    return ret
+}
+
+fun findCalibrationValue2(str: String): Int {
+    val arr = arrayListOf("one", "two", "three", "four", "five", "six", "seven", "eight", "nine")
+    var arrReversed = ArrayList(arr.map { it.reversed() })
+    var ret = 0
+
+    ret += searchString(str, arr) * 10
+    ret += searchString(str.reversed(), arrReversed)
+
+    return ret
+}
+
+private fun searchString(str: String, arr: ArrayList<String>): Int {
+    str.forEachIndexed { index, c ->
+        if (c.isDigit()) return c.digitToInt()
+        arr.forEachIndexed { arr_index, arr_str ->
+            if (arr_str.length + index <= str.length && str.substring(index, index + arr_str.length) == arr_str) return (arr_index + 1)
         }
     }
-
-    println(findHighestCalories(list))
-    println(findTopThreeCalories(list))
-}
-
-fun findHighestCalories(list: List<List<Int>>): Int {
-    //println(list)
-    var max = 0
-    for (elf in list) {
-        max = maxOf(max, elf.sumOf { it })
-    }
-    return max
-}
-
-fun findTopThreeCalories(list: List<List<Int>>): Int {
-    val map = list.map { it.sum() }
-    //println(map.sortedDescending().subList(0, 3))
-    return map.sortedDescending().subList(0, 3).sum()
+    return 0
 }
